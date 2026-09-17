@@ -8,6 +8,15 @@ app.use(cors());
 app.use(express.json());
 app.use(morgan("dev"));
 
+function requireClientId(req, res, next) {
+  req.clientId = req.header("X-Client-Id");
+  if (!req.clientId) return res.status(400).json({ error: "Missing X-Client-Id header" });
+  next();
+}
+// the below code ensures that the headrs are expected only for these 2 endpoints
+app.use("/vendors", requireClientId);
+app.use("/favorites", requireClientId);
+
 const PORT = process.env.PORT || 3333;
 
 // ---------- Data seed ----------
