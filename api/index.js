@@ -16,6 +16,12 @@ function requireClientId(req, res, next) {
 // the below code ensures that the headrs are expected only for these 2 endpoints
 app.use("/vendors", requireClientId);
 app.use("/favorites", requireClientId);
+const favorites = new Map(); // clientId -> Set<vendorId>
+
+function getFavoriteSet(clientId) {
+  if (!favorites.has(clientId)) favorites.set(clientId, new Set());
+  return favorites.get(clientId);
+}
 
 const PORT = process.env.PORT || 3333;
 
@@ -68,7 +74,6 @@ const vendors = Array.from({ length: 80 }, (_, i) => {
     },
     menu,
     isFeatured: Math.random() < 0.15,
-    isFavorite: false,
   };
 });
 
@@ -102,7 +107,9 @@ app.get("/", (_req, res) => {
       "GET /vendors?page=&limit=&city=&cuisine=",
       "GET /vendors/:id",
       "GET /vendors/:id/menu",
-      "POST /vendors/:id/favorite",
+      "POST /vendors/:id/favorites",
+      "DELETE /vendors/:id/favorites",
+      "GET /favorites",
       "GET /search?q=",
       "GET /featured",
       "GET /stats",
@@ -113,13 +120,16 @@ app.get("/", (_req, res) => {
 app.get("/vendors", (req, res) => {
   const { page = 1, limit = 20, city, cuisine } = req.query;
   const items = filterVendors({ city, cuisine });
-  res.json(paginate(items, page, limit));
+  const paginatedData = paginate(items, page, limit)
+  const data = paginatedData.data.map((v) => ({ ...v, isFavorite: getFavoriteSet(req.clientId).has(v.id) }));
+  res.json({ ...paginatedData, data });
 });
 
 app.get("/vendors/:id", (req, res) => {
   const v = vendors.find((x) => x.id === req.params.id);
   if (!v) return res.status(404).json({ error: "Not found" });
-  res.json(v);
+  const withFavorite = { ...v, isFavorite: getFavoriteSet(req.clientId).has(v.id) };
+  res.json(withFavorite);
 });
 
 app.get("/vendors/:id/menu", (req, res) => {
@@ -148,6 +158,25 @@ app.get("/stats", (_req, res) => {
   const byCuisine = Object.fromEntries(cuisines.map((cz) => [cz, vendors.filter((v) => v.cuisine === cz).length]));
   res.json({ total: vendors.length, byCity, byCuisine });
 });
+
+app.post("/vendors/:id/favorites", (req, res) => {
+  const v = vendors.find((x) => x.id === req.params.id);
+  if (!v) return res.status(404).json({ error: "Not found" });
+  getFavoriteSet(req.clientId).add(v.id);
+  res.status(204).end();
+});
+
+app.delete("/vendors/:id/favorites", (req, res) => {
+  getFavoriteSet(req.clientId).delete(req.params.id);
+  res.status(204).end();
+});
+
+app.get("/favorites", (req, res) => {
+  const ids = getFavoriteSet(req.clientId);
+  const data = vendors.filter((v) => ids.has(v.id));
+  res.json({ total: data.length, data });
+});
+
 
 app.post("/vendors/:id/favorite", (req, res) => {
   const v = vendors.find((x) => x.id === req.params.id);
