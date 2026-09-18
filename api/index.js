@@ -178,12 +178,12 @@ app.get("/favorites", (req, res) => {
 });
 
 
-app.post("/vendors/:id/favorite", (req, res) => {
-  const v = vendors.find((x) => x.id === req.params.id);
-  if (!v) return res.status(404).json({ error: "Not found" });
-  v.isFavorite = !v.isFavorite;
-  res.json({ id: v.id, isFavorite: v.isFavorite });
-});
+// app.post("/vendors/:id/favorite", (req, res) => {
+//   const v = vendors.find((x) => x.id === req.params.id);
+//   if (!v) return res.status(404).json({ error: "Not found" });
+//   v.isFavorite = !v.isFavorite;
+//   res.json({ id: v.id, isFavorite: v.isFavorite });
+// });
 
 // ---------- Start ----------
 app.listen(PORT, () => {
