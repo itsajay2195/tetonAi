@@ -48,7 +48,6 @@ const IMG = (id) => `https://picsum.photos/seed/vendor-${id}/320/240`;
 const vendors = Array.from({ length: 80 }, (_, i) => {
   const city = faker.helpers.arrayElement(cities);
   const cuisine = faker.helpers.arrayElement(cuisines);
-  const rating = Number((Math.random() * 2 + 3).toFixed(1)); // 3.0–5.0
   const menuSize = faker.number.int({ min: 4, max: 10 });
 
   const menu = Array.from({ length: menuSize }, (_, j) => ({
@@ -64,7 +63,6 @@ const vendors = Array.from({ length: 80 }, (_, i) => {
     name: `${faker.person.firstName()}'s ${cuisine} ${faker.company.buzzNoun()}`,
     cuisine,
     city,
-    rating,
     priceLevel: faker.helpers.arrayElement(priceLevels),
     thumbnail: IMG(i + 1),
     description: faker.lorem.sentences({ min: 1, max: 2 }),
@@ -74,10 +72,19 @@ const vendors = Array.from({ length: 80 }, (_, i) => {
     },
     menu,
     isFeatured: Math.random() < 0.15,
+    reviews:[]
   };
 });
 
 // ---------- Helpers ----------
+
+const ratingFor = (vendor) => {
+  if (vendor.reviews.length === 0) return 0;
+  const sum = vendor.reviews.reduce((total, r) => total + r.rating, 0);
+  return Number((sum / vendor.reviews.length).toFixed(1));
+};
+
+
 const paginate = (items, page = 1, limit = 20) => {
   const p = Math.max(1, Number(page));
   const l = Math.max(1, Math.min(100, Number(limit)));
@@ -113,6 +120,9 @@ app.get("/", (_req, res) => {
       "GET /search?q=",
       "GET /featured",
       "GET /stats",
+      "POST /vendors/:id/reviews",
+      "GET /vendors/:id/reviews?page=&limit=",
+
     ],
   });
 });
@@ -121,14 +131,14 @@ app.get("/vendors", (req, res) => {
   const { page = 1, limit = 20, city, cuisine } = req.query;
   const items = filterVendors({ city, cuisine });
   const paginatedData = paginate(items, page, limit)
-  const data = paginatedData.data.map((v) => ({ ...v, isFavorite: getFavoriteSet(req.clientId).has(v.id) }));
+  const data = paginatedData.data.map((v) => ({ ...v, isFavorite: getFavoriteSet(req.clientId).has(v.id), rating: ratingFor(v) }));
   res.json({ ...paginatedData, data });
 });
 
 app.get("/vendors/:id", (req, res) => {
   const v = vendors.find((x) => x.id === req.params.id);
   if (!v) return res.status(404).json({ error: "Not found" });
-  const withFavorite = { ...v, isFavorite: getFavoriteSet(req.clientId).has(v.id) };
+  const withFavorite = { ...v, isFavorite: getFavoriteSet(req.clientId).has(v.id), rating: ratingFor(v) };
   res.json(withFavorite);
 });
 
@@ -178,12 +188,38 @@ app.get("/favorites", (req, res) => {
 });
 
 
-// app.post("/vendors/:id/favorite", (req, res) => {
-//   const v = vendors.find((x) => x.id === req.params.id);
-//   if (!v) return res.status(404).json({ error: "Not found" });
-//   v.isFavorite = !v.isFavorite;
-//   res.json({ id: v.id, isFavorite: v.isFavorite });
-// });
+app.post("/vendors/:id/reviews", (req, res) => {
+  const v = vendors.find((x) => x.id === req.params.id);
+  if (!v) return res.status(404).json({ error: "Not found" });
+
+  const { rating, comment } = req.body;
+  // TODO: validate rating and comment, return 400 on failure
+  if (typeof rating !== "number" || !Number.isInteger(rating) || rating < 1 || rating > 5) {
+    return res.status(400).json({ error: "Invalid rating. Must be a number between 1 and 5." });
+  }
+  if (typeof comment !== "string" || comment.trim() === "") {
+    return res.status(400).json({ error: "Invalid comment. Must be a non-empty string." });
+  }
+  // TODO: build the review object and push it into v.reviews
+  const review = {
+    id: faker.string.uuid(),
+    rating,
+    comment,
+    date: new Date().toISOString()
+  };
+  v.reviews.push(review);
+
+  // TODO: respond
+  return res.status(201).json({ message: "Review added successfully.", review });
+});
+
+app.get("/vendors/:id/reviews", (req, res) => {
+  const v = vendors.find((x) => x.id === req.params.id);
+  if (!v) return res.status(404).json({ error: "Not found" });
+  res.json(paginate(v.reviews, req.query.page, req.query.limit));
+});
+
+
 
 // ---------- Start ----------
 app.listen(PORT, () => {
