@@ -8,6 +8,21 @@ app.use(cors());
 app.use(express.json());
 app.use(morgan("dev"));
 
+function requireClientId(req, res, next) {
+  req.clientId = req.header("X-Client-Id");
+  if (!req.clientId) return res.status(400).json({ error: "Missing X-Client-Id header" });
+  next();
+}
+// the below code ensures that the headrs are expected only for these 2 endpoints
+app.use("/vendors", requireClientId);
+app.use("/favorites", requireClientId);
+const favorites = new Map(); // clientId -> Set<vendorId>
+
+function getFavoriteSet(clientId) {
+  if (!favorites.has(clientId)) favorites.set(clientId, new Set());
+  return favorites.get(clientId);
+}
+
 const PORT = process.env.PORT || 3333;
 
 // ---------- Data seed ----------
@@ -33,7 +48,6 @@ const IMG = (id) => `https://picsum.photos/seed/vendor-${id}/320/240`;
 const vendors = Array.from({ length: 80 }, (_, i) => {
   const city = faker.helpers.arrayElement(cities);
   const cuisine = faker.helpers.arrayElement(cuisines);
-  const rating = Number((Math.random() * 2 + 3).toFixed(1)); // 3.0–5.0
   const menuSize = faker.number.int({ min: 4, max: 10 });
 
   const menu = Array.from({ length: menuSize }, (_, j) => ({
@@ -49,7 +63,6 @@ const vendors = Array.from({ length: 80 }, (_, i) => {
     name: `${faker.person.firstName()}'s ${cuisine} ${faker.company.buzzNoun()}`,
     cuisine,
     city,
-    rating,
     priceLevel: faker.helpers.arrayElement(priceLevels),
     thumbnail: IMG(i + 1),
     description: faker.lorem.sentences({ min: 1, max: 2 }),
@@ -59,11 +72,19 @@ const vendors = Array.from({ length: 80 }, (_, i) => {
     },
     menu,
     isFeatured: Math.random() < 0.15,
-    isFavorite: false,
+    reviews:[]
   };
 });
 
 // ---------- Helpers ----------
+
+const ratingFor = (vendor) => {
+  if (vendor.reviews.length === 0) return 0;
+  const sum = vendor.reviews.reduce((total, r) => total + r.rating, 0);
+  return Number((sum / vendor.reviews.length).toFixed(1));
+};
+
+
 const paginate = (items, page = 1, limit = 20) => {
   const p = Math.max(1, Number(page));
   const l = Math.max(1, Math.min(100, Number(limit)));
@@ -93,10 +114,15 @@ app.get("/", (_req, res) => {
       "GET /vendors?page=&limit=&city=&cuisine=",
       "GET /vendors/:id",
       "GET /vendors/:id/menu",
-      "POST /vendors/:id/favorite",
+      "POST /vendors/:id/favorites",
+      "DELETE /vendors/:id/favorites",
+      "GET /favorites",
       "GET /search?q=",
       "GET /featured",
       "GET /stats",
+      "POST /vendors/:id/reviews",
+      "GET /vendors/:id/reviews?page=&limit=",
+
     ],
   });
 });
@@ -104,13 +130,16 @@ app.get("/", (_req, res) => {
 app.get("/vendors", (req, res) => {
   const { page = 1, limit = 20, city, cuisine } = req.query;
   const items = filterVendors({ city, cuisine });
-  res.json(paginate(items, page, limit));
+  const paginatedData = paginate(items, page, limit)
+  const data = paginatedData.data.map((v) => ({ ...v, isFavorite: getFavoriteSet(req.clientId).has(v.id), rating: ratingFor(v) }));
+  res.json({ ...paginatedData, data });
 });
 
 app.get("/vendors/:id", (req, res) => {
   const v = vendors.find((x) => x.id === req.params.id);
   if (!v) return res.status(404).json({ error: "Not found" });
-  res.json(v);
+  const withFavorite = { ...v, isFavorite: getFavoriteSet(req.clientId).has(v.id), rating: ratingFor(v) };
+  res.json(withFavorite);
 });
 
 app.get("/vendors/:id/menu", (req, res) => {
@@ -140,12 +169,57 @@ app.get("/stats", (_req, res) => {
   res.json({ total: vendors.length, byCity, byCuisine });
 });
 
-app.post("/vendors/:id/favorite", (req, res) => {
+app.post("/vendors/:id/favorites", (req, res) => {
   const v = vendors.find((x) => x.id === req.params.id);
   if (!v) return res.status(404).json({ error: "Not found" });
-  v.isFavorite = !v.isFavorite;
-  res.json({ id: v.id, isFavorite: v.isFavorite });
+  getFavoriteSet(req.clientId).add(v.id);
+  res.status(204).end();
 });
+
+app.delete("/vendors/:id/favorites", (req, res) => {
+  getFavoriteSet(req.clientId).delete(req.params.id);
+  res.status(204).end();
+});
+
+app.get("/favorites", (req, res) => {
+  const ids = getFavoriteSet(req.clientId);
+  const data = vendors.filter((v) => ids.has(v.id));
+  res.json({ total: data.length, data });
+});
+
+
+app.post("/vendors/:id/reviews", (req, res) => {
+  const v = vendors.find((x) => x.id === req.params.id);
+  if (!v) return res.status(404).json({ error: "Not found" });
+
+  const { rating, comment } = req.body;
+  // TODO: validate rating and comment, return 400 on failure
+  if (typeof rating !== "number" || !Number.isInteger(rating) || rating < 1 || rating > 5) {
+    return res.status(400).json({ error: "Invalid rating. Must be a number between 1 and 5." });
+  }
+  if (typeof comment !== "string" || comment.trim() === "") {
+    return res.status(400).json({ error: "Invalid comment. Must be a non-empty string." });
+  }
+  // TODO: build the review object and push it into v.reviews
+  const review = {
+    id: faker.string.uuid(),
+    rating,
+    comment,
+    date: new Date().toISOString()
+  };
+  v.reviews.push(review);
+
+  // TODO: respond
+  return res.status(201).json({ message: "Review added successfully.", review });
+});
+
+app.get("/vendors/:id/reviews", (req, res) => {
+  const v = vendors.find((x) => x.id === req.params.id);
+  if (!v) return res.status(404).json({ error: "Not found" });
+  res.json(paginate(v.reviews, req.query.page, req.query.limit));
+});
+
+
 
 // ---------- Start ----------
 app.listen(PORT, () => {
