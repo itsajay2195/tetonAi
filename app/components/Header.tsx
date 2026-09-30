@@ -1,8 +1,8 @@
-import { Text, View } from "react-native";
+import { Text, View, StyleSheet } from "react-native";
 import { useTheme } from "../theme/ThemeContext";
 import ThemeToggleButton from "./ThemeToggleButton";
-import { useState } from "react";
 import { SearchBar } from "./Searchbar";
+import { useThemedStyles } from "../hooks/useThemedStyles";
 
 type Props = {
     title?: string;
@@ -12,10 +12,11 @@ type Props = {
 };
 
 export function Header({ title, showSearch, searchQuery, onSearchQueryChange }: Props) {
-    const { colors, theme, toggleTheme } = useTheme();
-    const [isEnabled, setIsEnabled] = useState(theme === "dark");
+    const { theme, toggleTheme } = useTheme();
+    const isEnabled = theme === "dark";
+    const styles = useThemedStyles(createHeaderStyles);
     return (
-        <View style={{ flex: 1, flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', padding: 0, height: 60, marginTop: 50, paddingHorizontal: 10, gap: 10 }}>
+        <View style={styles.container}>
             {title ? <Text>
                 {title}
             </Text> : null}
@@ -26,3 +27,21 @@ export function Header({ title, showSearch, searchQuery, onSearchQueryChange }: 
         </View>
     );
 }
+
+function createHeaderStyles(colors: ReturnType<typeof useTheme>["colors"]) {
+    return StyleSheet.create({
+        container: {
+            display: 'flex',
+            flexDirection: 'row',
+            justifyContent: 'space-between',
+            alignItems: 'center',
+            height: 60,
+            marginTop: 50,
+            paddingHorizontal: 10,
+            gap: 10,
+            backgroundColor: colors.bg,
+        },
+    });
+}
+
+

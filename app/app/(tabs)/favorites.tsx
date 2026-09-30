@@ -1,10 +1,11 @@
 import { StyleSheet, Text, View } from 'react-native'
 import React from 'react'
+import { Header } from '../../components/Header'
 
 const Favorites = () => {
     return (
         <View>
-            <Text>F</Text>
+            <Header title="Favorites" />
         </View>
     )
 }
