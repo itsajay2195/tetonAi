@@ -3,6 +3,7 @@ import { useCallback } from "react";
 import VendorCard from "../../../components/VendorCard";
 import { useVendors } from "../../../api/hooks/useVendors";
 import { Vendor } from "../../../types/vendor";
+import { Header } from "../../../components/Header";
 
 export default function VendorsList() {
     const isAndroid = Platform.OS === 'android';
@@ -26,6 +27,7 @@ export default function VendorsList() {
     if (error) return <View><Text>Error: {error.message}</Text></View>;
     return (
         <View style={{ flex: 1 }}>
+            <Header showSearch={true} />
             <FlatList
                 data={data}
                 renderItem={renderItem}
