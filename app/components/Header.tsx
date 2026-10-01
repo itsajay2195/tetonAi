@@ -12,8 +12,6 @@ type Props = {
 };
 
 export function Header({ title, showSearch, searchQuery, onSearchQueryChange }: Props) {
-    const { theme, toggleTheme } = useTheme();
-    const isEnabled = theme === "dark";
     const styles = useThemedStyles(createHeaderStyles);
     return (
         <View style={styles.container}>
@@ -36,7 +34,6 @@ function createHeaderStyles(colors: ReturnType<typeof useTheme>["colors"]) {
             justifyContent: 'space-between',
             alignItems: 'center',
             height: 60,
-            marginTop: 50,
             paddingHorizontal: 10,
             gap: 10,
             backgroundColor: colors.bg,
