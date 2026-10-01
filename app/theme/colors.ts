@@ -27,6 +27,13 @@ export const primitives = {
         700: '#2E7D32', // Vegan Badge Text (Light)
         900: '#1B3320', // Vegan Badge BG (Dark)
     },
+    blue: {
+        100: '#E3F2FD',
+        400: '#64B5F6',
+        500: '#2196F3', // Accent / Active State
+        700: '#1976D2',
+        900: '#0D47A1',
+    },
     gray: {
         50: '#F8F9FA',
         100: '#F1F3F5',
@@ -48,6 +55,9 @@ export const lightColors = {
     primary: primitives.orange[500],
     primaryPressed: primitives.orange[600],
     primaryLight: primitives.orange[100],
+
+    // Accent (e.g. active tab state)
+    accent: primitives.blue[500],
 
     // Ratings
     rating: primitives.yellow[500],
@@ -84,6 +94,9 @@ export const darkColors: typeof lightColors = {
     primary: primitives.orange[400],
     primaryPressed: primitives.orange[600],
     primaryLight: primitives.orange[900],
+
+    // Accent (e.g. active tab state)
+    accent: primitives.blue[400],
 
     // Ratings
     rating: primitives.yellow[400],
