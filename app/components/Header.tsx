@@ -23,7 +23,7 @@ export function Header({ title, showSearch, searchQuery, onSearchQueryChange }: 
             {showSearch && (
                 <SearchBar value={searchQuery ?? ""} onChangeText={onSearchQueryChange ?? (() => { })} />
             )}
-            <ThemeToggleButton isEnabled={isEnabled} toggleSwitch={toggleTheme} />
+            <ThemeToggleButton />
         </View>
     );
 }
