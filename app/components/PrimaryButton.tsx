@@ -16,7 +16,7 @@ export default function PrimaryButton({ label, onPress, icon, disabled, loading 
     const isDisabled = disabled || loading;
 
     return (
-        <View style={{ flexDirection: 'row', marginVertical: 10, paddingHorizontal: 40 }}>
+        <View style={{ flexDirection: 'row', marginVertical: 10 }}>
             <Pressable
                 onPress={onPress}
                 disabled={isDisabled}
@@ -27,7 +27,7 @@ export default function PrimaryButton({ label, onPress, icon, disabled, loading 
                     gap: 10,
                     justifyContent: 'center',
                     alignItems: 'center',
-                    backgroundColor: colors.accent,
+                    backgroundColor: colors.primary,
                     borderRadius: 10,
                     opacity: isDisabled ? 0.5 : 1,
                 }}

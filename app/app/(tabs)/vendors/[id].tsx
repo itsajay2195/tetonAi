@@ -15,6 +15,7 @@ import { StarRating } from "../../../components/StarsRating";
 import PrimaryButton from "../../../components/PrimaryButton";
 import { useSubmitReview } from "../../../api/hooks/useSubmitReview";
 import ReviewItemCard from "../../../components/vendor-details/ReviewItemCard";
+import { ReviewsSummary } from "../../../components/vendor-details/ReviewSumary";
 
 export default function VendorDetails() {
     const { id }: { id: string } = useLocalSearchParams();
@@ -104,10 +105,15 @@ export default function VendorDetails() {
 
             <View style={{ flex: 1, padding: 10, backgroundColor: colors.bg, gap: 10, borderTopLeftRadius: 20, borderTopRightRadius: 20, marginTop: -25 }}>
                 <RestaurantInfo cuisine={cuisine} name={name} rating={rating} description={description} menuLength={data?.menu.length || 0} reviewsCount={reviews.length} />
-                <MenuReviewsTabs handleMenuPress={handleMenuPress} handleReviewsPress={handleReviewsPress} menuTabStyle={menuTabStyle} reviewsTabStyle={reviewsTabStyle} reviewsCount={reviews.length} />
+                <MenuReviewsTabs handleMenuPress={handleMenuPress} handleReviewsPress={handleReviewsPress} menuTabStyle={menuTabStyle} reviewsTabStyle={reviewsTabStyle} reviewsCount={reviews.length} isMenuActive={isMenuActive} />
+                {!isMenuActive && data?.reviews && data.reviews.length > 0 && (
+                    <ReviewsSummary reviews={data.reviews} averageRating={rating} />
+                )}
+
                 {!isMenuActive && (
                     <PrimaryButton label="Write a Review" icon="pencil" onPress={() => setShowReviewSheet(true)} />
                 )}
+
 
                 <FlatList
                     data={menuAndReviews}
@@ -115,7 +121,9 @@ export default function VendorDetails() {
                     keyExtractor={keyExtractor}
                     ListEmptyComponent={() => (
                         <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center', paddingVertical: 20 }}>
-                            <Text style={{ color: colors.textSecondary }}>No {activeTab} available.</Text>
+                            <Text style={{ color: colors.textSecondary }}>
+                                {activeTab === 'reviews' ? 'No reviews yet. Be the first!' : 'No menu items available.'}
+                            </Text>
                         </View>
                     )}
                 />

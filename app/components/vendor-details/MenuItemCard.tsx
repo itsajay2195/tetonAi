@@ -20,10 +20,11 @@ const MenuItemCard = ({ item }: Props) => {
                 <Text style={{ fontSize: 16, fontWeight: "500", color: colors.textMain }}>{item?.name}</Text>
                 <Text style={{ fontSize: 16, fontWeight: "500", color: colors.textMain }}>${item?.price?.toFixed(2)}</Text>
             </View>
-            <View style={{ flexDirection: "row", gap: 10, alignItems: "center" }}>
+            <View style={{ flexDirection: "row", gap: 10, alignItems: "center", minHeight: 24, marginTop: 4 }}>
                 {item?.spicy && <DietBadge type="spicy" />}
                 {item?.vegan && <DietBadge type="vegan" />}
             </View>
+
 
         </View>
     )

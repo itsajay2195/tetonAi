@@ -17,7 +17,7 @@ const RestaurantInfo = ({ cuisine, name, reviewsCount, rating, description, menu
     const { colors } = useTheme();
     return (
         <View style={{ display: "flex", gap: 4 }}>
-            <Text style={{ fontSize: 16, fontWeight: "bold", color: primitives.red[600] }}>{cuisine}</Text>
+            <Text style={{ fontSize: 16, fontWeight: "bold", color: colors.primary }}>{cuisine}</Text>
             <Text style={{ fontSize: 20, color: colors.textMain, fontWeight: "500" }}>{name}</Text>
             <View style={{ flexDirection: "row", alignItems: "center", gap: 6 }}>
                 <View style={{ flexDirection: "row", alignItems: "center", gap: 4 }}>
