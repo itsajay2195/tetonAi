@@ -11,8 +11,9 @@ type Props = {
     rating: number;
     description: string;
     menuLength: number;
+    reviewsCount?: number
 };
-const RestaurantInfo = ({ cuisine, name, rating, description, menuLength }: Props) => {
+const RestaurantInfo = ({ cuisine, name, reviewsCount, rating, description, menuLength }: Props) => {
     const { colors } = useTheme();
     return (
         <View style={{ display: "flex", gap: 4 }}>
@@ -24,8 +25,8 @@ const RestaurantInfo = ({ cuisine, name, rating, description, menuLength }: Prop
                     <Text style={{ fontSize: 14, color: colors.textMain, fontWeight: "700" }}>{rating}</Text>
                 </View>
 
-                {rating ? (<View >
-                    <Text style={{ fontSize: 14, color: colors.textSecondary, textDecorationLine: "underline" }}>{rating} ratings</Text>
+                {reviewsCount ? (<View >
+                    <Text style={{ fontSize: 14, color: colors.textSecondary, textDecorationLine: "underline" }}>{reviewsCount} reviews</Text>
                 </View>) : null}
 
                 <Text style={{ fontSize: 14, color: colors.textSecondary, textDecorationLine: "underline" }}>{menuLength} dishes</Text>

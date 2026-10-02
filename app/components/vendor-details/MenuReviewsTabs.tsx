@@ -7,17 +7,21 @@ type Props = {
     handleReviewsPress: () => void;
     menuTabStyle: ViewStyle;
     reviewsTabStyle: ViewStyle;
+    reviewsCount?: number;
 };
 
-const MenuReviewsTabs = ({ handleMenuPress, handleReviewsPress, menuTabStyle, reviewsTabStyle }: Props) => {
+const MenuReviewsTabs = ({ handleMenuPress, handleReviewsPress, menuTabStyle, reviewsTabStyle, reviewsCount }: Props) => {
     const { colors } = useTheme();
+    const hasReviews = reviewsCount && reviewsCount > 0;
+    const displayReviewsCount = hasReviews ? reviewsCount : 0;
+    const reviewsText = hasReviews ? `Reviews (${displayReviewsCount})` : "Reviews";
     return (
         <View style={{ flexDirection: "row", alignItems: "center", gap: 10, paddingVertical: 4, borderRadius: 10, backgroundColor: colors.surface, }}>
             <Pressable style={menuTabStyle} onPress={handleMenuPress}>
                 <Text style={{ color: colors.textMain }}>Menu</Text>
             </Pressable>
             <Pressable style={reviewsTabStyle} onPress={handleReviewsPress}>
-                <Text style={{ color: colors.textMain }}>Reviews</Text>
+                <Text style={{ color: colors.textMain }}>{reviewsText}</Text>
             </Pressable>
         </View>
     )
