@@ -35,8 +35,8 @@ const styles = StyleSheet.create({
         flexDirection: "row",
         alignItems: "center",
         gap: 4,
+        height: 24,
         paddingHorizontal: tokens.spacing.sm,
-        paddingVertical: 2,
         borderRadius: tokens.borderRadius.full,
     },
     label: {
