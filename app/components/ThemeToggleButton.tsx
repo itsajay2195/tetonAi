@@ -1,26 +1,14 @@
-import { StyleSheet, Text, View, Switch } from 'react-native'
-import React from 'react'
+import { Pressable } from "react-native";
+import { Ionicons } from "@expo/vector-icons";
+import { useTheme } from "../theme/ThemeContext";
 
 
-type Props = {
-    isEnabled?: boolean;
-    searchQuery?: string;
-    toggleSwitch?: () => void;
-};
-
-
-const ThemeToggleButton = ({ isEnabled, toggleSwitch }: Props) => {
+export default function ThemeToggleButton() {
+    const { theme, toggleTheme, colors } = useTheme();
     return (
-        <Switch
-            trackColor={{ false: '#767577', true: '#81b0ff' }}
-            thumbColor={isEnabled ? '#f5dd4b' : '#f4f3f4'}
-            ios_backgroundColor="#3e3e3e"
-            onValueChange={toggleSwitch}
-            value={isEnabled}
-        />
-    )
+        <Pressable onPress={toggleTheme} hitSlop={8}>
+            <Ionicons name={theme === "dark" ? "moon" : "sunny"} size={22} color={colors.textMain} />
+        </Pressable>
+    );
 }
 
-export default ThemeToggleButton
-
-const styles = StyleSheet.create({})
