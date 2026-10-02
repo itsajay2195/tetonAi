@@ -13,10 +13,11 @@ type Props = {
     showSearch?: boolean;
     searchQuery?: string;
     onSearchQueryChange?: (text: string) => void;
+    rightChild?: React.ReactNode;
     variant?: "default" | "floating";
 };
 
-export function Header({ title, showSearch, searchQuery, onSearchQueryChange, variant = "default" }: Props) {
+export function Header({ title, showSearch, searchQuery, onSearchQueryChange, rightChild, variant = "default", }: Props) {
     const insets = useSafeAreaInsets();
     const styles = useThemedStyles((colors) => createHeaderStyles(colors, insets.top));
     const { colors } = useTheme();
@@ -30,6 +31,9 @@ export function Header({ title, showSearch, searchQuery, onSearchQueryChange, va
                 <Pressable onPress={handleBackPress} style={{ height: 40, width: 40, justifyContent: 'center', alignItems: 'center', backgroundColor: colors.overlayButtonBg, borderRadius: 20, }}>
                     <Ionicons name="chevron-back" size={18} color={colors.overlayButtonIcon} />
                 </Pressable>
+                <View style={{ flex: 1, alignItems: 'flex-end' }}>
+                    {rightChild}
+                </View>
             </View>
         );
     }

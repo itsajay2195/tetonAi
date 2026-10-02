@@ -9,6 +9,7 @@ import MenuItemCard from "../../../components/vendor-details/MenuItemCard";
 import RestaurantInfo from "../../../components/vendor-details/RestaurantInfo";
 import { useCallback, useMemo, useState } from "react";
 import MenuReviewsTabs from "../../../components/vendor-details/MenuReviewsTabs";
+import { Ionicons } from "@expo/vector-icons";
 
 export default function VendorDetails() {
     const { id }: { id: string } = useLocalSearchParams();
@@ -65,7 +66,11 @@ export default function VendorDetails() {
 
     return (
         <View style={styles.container}>
-            <Header title="Vendor Details" variant="floating" />
+            <Header title="Vendor Details" variant="floating"
+                rightChild={<Pressable onPress={() => { }} style={{ height: 40, width: 40, justifyContent: 'center', alignItems: 'center', backgroundColor: colors.overlayButtonBg, borderRadius: 20, }}>
+                    <Ionicons name="heart" size={18} color={colors.overlayButtonIcon} />
+                </Pressable>}
+            />
             <View >
                 <View style={{ height: 180 }}>
                     <Image source={{ uri: thumbnail }} style={{ width: "100%", height: "100%" }} contentFit="cover" />
@@ -73,8 +78,17 @@ export default function VendorDetails() {
             </View>
 
             <View style={{ flex: 1, padding: 10, backgroundColor: colors.bg, gap: 10, borderTopLeftRadius: 20, borderTopRightRadius: 20, marginTop: -25 }}>
-                <RestaurantInfo cuisine={cuisine} name={name} rating={rating} description={description} menuLength={data?.menu.length || 0} />
+                {isMenuActive ? (<RestaurantInfo cuisine={cuisine} name={name} rating={rating} description={description} menuLength={data?.menu.length || 0} />) : null}
                 <MenuReviewsTabs handleMenuPress={handleMenuPress} handleReviewsPress={handleReviewsPress} menuTabStyle={menuTabStyle} reviewsTabStyle={reviewsTabStyle} />
+                {!isMenuActive && (
+                    <View style={{ flexDirection: 'row', flex: 1, marginVertical: 10, paddingHorizontal: 40 }}>
+                        <Pressable onPress={() => { }} style={{ height: 40, width: "100%", flexDirection: 'row', gap: 10, justifyContent: 'center', alignItems: 'center', backgroundColor: colors.accent, borderRadius: 10, }}>
+                            <Ionicons name="pencil" size={10} color={colors.textOnPrimary} />
+                            <Text style={{ color: colors.textOnPrimary, fontSize: 16 }}>Write a review</Text>
+                        </Pressable>
+                    </View>
+                )}
+
                 <FlatList
                     data={menuAndReviews}
                     renderItem={renderItem}
