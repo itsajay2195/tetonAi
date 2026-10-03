@@ -1,16 +1,34 @@
 import { Stack } from "expo-router";
-import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import { MutationCache, QueryCache, QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { ThemeProvider } from "../theme/ThemeContext";
 import { SafeAreaProvider } from "react-native-safe-area-context";
+import { SnackbarProvider, useSnackbar } from "../theme/snackbarContext";
+import { NoNetworkBanner } from "../components/NoNetworkBanner";
+import { ReactNode, useState } from "react";
 
-const queryClient = new QueryClient();
+function QueryProvider({ children }: { children: ReactNode }) {
+    const { showError } = useSnackbar();
+    const [queryClient] = useState(() => new QueryClient({
+        queryCache: new QueryCache({
+            onError: (error) => showError(error instanceof Error ? error.message : "Something went wrong"),
+        }),
+        mutationCache: new MutationCache({
+            onError: (error) => showError(error instanceof Error ? error.message : "Something went wrong"),
+        }),
+    }));
+
+    return <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>;
+}
 export default function RootLayout() {
     return (
         <SafeAreaProvider>
             <ThemeProvider>
-                <QueryClientProvider client={queryClient}>
-                    <Stack screenOptions={{ headerShown: false }} />
-                </QueryClientProvider>
+                <SnackbarProvider>
+                    <QueryProvider>
+                        <NoNetworkBanner />
+                        <Stack screenOptions={{ headerShown: false }} />
+                    </QueryProvider>
+                </SnackbarProvider>
             </ThemeProvider>
         </SafeAreaProvider>
 

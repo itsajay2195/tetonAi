@@ -9,7 +9,6 @@ import { useSearch } from "../../../api/hooks/useSearch";
 import { useTheme } from "../../../theme/ThemeContext";
 import { useThemedStyles } from "../../../hooks/useThemedStyles";
 
-
 export default function VendorsList() {
     const isAndroid = Platform.OS === 'android';
     const styles = useThemedStyles(createHeaderStyles);
