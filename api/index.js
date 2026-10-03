@@ -183,7 +183,9 @@ app.delete("/vendors/:id/favorites", (req, res) => {
 
 app.get("/favorites", (req, res) => {
   const ids = getFavoriteSet(req.clientId);
-  const data = vendors.filter((v) => ids.has(v.id));
+  const data = vendors
+    .filter((v) => ids.has(v.id))
+    .map((v) => ({ ...v, isFavorite: true, rating: ratingFor(v) }));
   res.json({ total: data.length, data });
 });
 

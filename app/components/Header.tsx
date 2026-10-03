@@ -39,7 +39,7 @@ export function Header({ title, showSearch, searchQuery, onSearchQueryChange, ri
     }
     return (
         <View style={styles.container}>
-            {title ? <Text>
+            {title ? <Text style={{ color: colors.textMain, fontSize: 20, fontWeight: 'bold' }}>
                 {title}
             </Text> : null}
             {showSearch && (

@@ -16,6 +16,7 @@ import PrimaryButton from "../../../components/PrimaryButton";
 import { useSubmitReview } from "../../../api/hooks/useSubmitReview";
 import ReviewItemCard from "../../../components/vendor-details/ReviewItemCard";
 import { ReviewsSummary } from "../../../components/vendor-details/ReviewSumary";
+import { useToggleFavorite } from "../../../api/hooks/useToggleFavorite";
 
 export default function VendorDetails() {
     const { id }: { id: string } = useLocalSearchParams();
@@ -27,6 +28,7 @@ export default function VendorDetails() {
     const isMenuActive = activeTab === "menu";
     const colors = useTheme().colors;
     const styles = useThemedStyles((colors) => createVendorDetialsStyles(colors));
+    const { mutate: toggleFavorite } = useToggleFavorite(id);
     const { data, isLoading, error } = useVendor(id);
     const { name, description, rating, thumbnail, cuisine, reviews } = data || { name: "", description: "", rating: 0, thumbnail: "", cuisine: "" };
     const sample = data?.menu[0];
@@ -86,6 +88,10 @@ export default function VendorDetails() {
             }
         );
     };
+    const handleToggleFavorite = useCallback(() => {
+        toggleFavorite(!data?.isFavorite);
+    }, [toggleFavorite, data?.isFavorite]);
+    const isFavorite = data?.isFavorite ?? false;
     if (isLoading) return <View style={{ flexDirection: "row", justifyContent: "center", alignItems: "center" }}><ActivityIndicator size="small" /></View>;
     if (error) return <View><Text>Error: {error?.message}</Text></View>;
     if (!data) return <View><Text>No data found for vendor with ID: {id}</Text></View>;
@@ -93,8 +99,8 @@ export default function VendorDetails() {
     return (
         <View style={styles.container}>
             <Header title="Vendor Details" variant="floating"
-                rightChild={<Pressable onPress={() => { }} style={{ height: 40, width: 40, justifyContent: 'center', alignItems: 'center', backgroundColor: colors.overlayButtonBg, borderRadius: 20, }}>
-                    <Ionicons name="heart" size={18} color={colors.overlayButtonIcon} />
+                rightChild={<Pressable onPress={handleToggleFavorite} style={{ height: 40, width: 40, justifyContent: 'center', alignItems: 'center', backgroundColor: colors.overlayButtonBg, borderRadius: 20, }}>
+                    <Ionicons name={isFavorite ? "heart" : "heart-outline"} size={18} color={colors.overlayButtonIcon} />
                 </Pressable>}
             />
             <View >
@@ -151,7 +157,7 @@ export default function VendorDetails() {
                             numberOfLines={10}
                             value={reviewText}
                             onChangeText={setReviewText}
-                            style={{ height: 100, width: "100%", borderColor: colors.border, borderWidth: 1, borderRadius: 4, textAlignVertical: "top" }}
+                            style={{ height: 100, width: "100%", borderColor: colors.border, borderWidth: 1, borderRadius: 4, textAlignVertical: "top", color: colors.textMain, padding: 8 }}
                         />
                     </View>
                 </View>
