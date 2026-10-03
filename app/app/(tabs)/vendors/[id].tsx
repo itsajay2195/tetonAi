@@ -157,7 +157,7 @@ export default function VendorDetails() {
                             numberOfLines={10}
                             value={reviewText}
                             onChangeText={setReviewText}
-                            style={{ height: 100, width: "100%", borderColor: colors.border, borderWidth: 1, borderRadius: 4, textAlignVertical: "top" }}
+                            style={{ height: 100, width: "100%", borderColor: colors.border, borderWidth: 1, borderRadius: 4, textAlignVertical: "top", color: colors.textMain, padding: 8 }}
                         />
                     </View>
                 </View>
