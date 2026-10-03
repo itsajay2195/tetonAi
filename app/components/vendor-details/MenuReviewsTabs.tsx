@@ -1,5 +1,4 @@
 import { Pressable, StyleSheet, Text, View, ViewStyle } from 'react-native'
-import React from 'react'
 import { useTheme } from '../../theme/ThemeContext';
 
 type Props = {
