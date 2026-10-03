@@ -88,6 +88,8 @@ export const lightColors = {
     overlay: 'rgba(0, 0, 0, 0.4)',
     overlayButtonBg: 'rgba(0, 0, 0, 0.35)',
     overlayButtonIcon: '#FFFFFF',
+    errorBg: primitives.red[100],
+    errorText: primitives.red[600]
 };
 
 // 3. Semantic Dark Theme
@@ -129,6 +131,8 @@ export const darkColors: typeof lightColors = {
     overlay: 'rgba(0, 0, 0, 0.7)',
     overlayButtonBg: 'rgba(0, 0, 0, 0.35)',
     overlayButtonIcon: '#FFFFFF',
+    errorBg: primitives.red[100],
+    errorText: primitives.red[600]
 };
 
 // 4. Shared Tokens & Theme Context Setup
