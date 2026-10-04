@@ -5,12 +5,12 @@ import { tokens } from '../../theme/colors';
 
 type Props = {
     reviews: { rating: number }[];
-    averageRating: number;
 };
 
-export function ReviewsSummary({ reviews, averageRating }: Props) {
+export function ReviewsSummary({ reviews }: Props) {
     const { colors } = useTheme();
     const total = reviews.length;
+    const average = total > 0 ? reviews.reduce((sum, r) => sum + r.rating, 0) / total : 0;
     const distribution = [5, 4, 3, 2, 1].map((star) => {
         const count = reviews.filter((r) => r.rating === star).length;
         return { star, count, percent: total > 0 ? (count / total) * 100 : 0 };
@@ -19,10 +19,8 @@ export function ReviewsSummary({ reviews, averageRating }: Props) {
     return (
         <View style={{ flexDirection: 'row', gap: 20, paddingVertical: 10 }}>
             <View style={{ alignItems: 'center', justifyContent: 'center', gap: 4 }}>
-                <Text style={{ fontSize: 36, fontWeight: '700', color: colors.textMain }}>
-                    {averageRating.toFixed(1)}
-                </Text>
-                <StarRating rating={Math.round(averageRating)} readOnly size={16} />
+                <Text style={{ fontSize: 36, fontWeight: '700', color: colors.textMain }}>{average.toFixed(1)}</Text>
+                <StarRating rating={Math.round(average)} readOnly size={16} />
                 <Text style={{ fontSize: 12, color: colors.textSecondary }}>{total} reviews</Text>
             </View>
             <View style={{ flex: 1, justifyContent: 'center', gap: 4 }}>

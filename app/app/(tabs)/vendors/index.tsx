@@ -1,4 +1,4 @@
-import { Text, View, FlatList, Platform, StyleSheet } from "react-native";
+import { Text, View, FlatList, Platform, StyleSheet, ActivityIndicator } from "react-native";
 import { useCallback, useState } from "react";
 import VendorCard from "../../../components/VendorCard";
 import { useVendors } from "../../../api/hooks/useVendors";
@@ -32,6 +32,12 @@ export default function VendorsList() {
             fetchNextPage();
         }
     }, [hasNextPage, isFetchingNextPage, fetchNextPage]);
+    const listEmptyComponent = useCallback(() => {
+        if (isFetchingNextPage) {
+            return <View style={{ justifyContent: 'center', alignItems: 'center' }}><ActivityIndicator /></View>;
+        }
+        return null;
+    }, [isFetchingNextPage])
     if (isLoading) return <View><Text>Loading...</Text></View>;
     if (error) return <View><Text>Error: {error?.message}</Text></View>;
     const dataToRender: Vendor[] = isSearching ? searchResults : data;
@@ -64,7 +70,7 @@ export default function VendorsList() {
                 numColumns={2}
                 onEndReached={onEndReachedHandler}
                 onEndReachedThreshold={0.5}
-                ListFooterComponent={isFetchingNextPage ? <Text>Loading more...</Text> : null}
+                ListFooterComponent={listEmptyComponent}
                 refreshing={isRefetching}
                 onRefresh={onRefreshHandler}
                 initialNumToRender={10}
