@@ -16,6 +16,7 @@ const ThemeContext = createContext<{
 export function ThemeProvider({ children }: { children: React.ReactNode }) {
     const systemScheme = useColorScheme();
     const [theme, setTheme] = useState<ThemeName>(systemScheme === "dark" ? "dark" : "light");
+    const [isHydrated, setIsHydrated] = useState(false);
 
     useEffect(() => {
         (async () => {
@@ -23,9 +24,9 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
             if (value === "light" || value === "dark") {
                 setTheme(value);
             }
+            setIsHydrated(true);
         })();
     }, []);
-
 
     const toggleTheme = useCallback(() => {
         const next = theme === "light" ? "dark" : "light";
@@ -35,12 +36,15 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
 
     const colors = theme === "dark" ? darkColors : lightColors;
 
+    if (!isHydrated) return null;
+
     return (
         <ThemeContext.Provider value={{ theme, colors, toggleTheme }}>
             {children}
         </ThemeContext.Provider>
     );
 }
+
 
 export function useTheme() {
     const ctx = useContext(ThemeContext);

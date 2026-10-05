@@ -73,7 +73,7 @@ export default function VendorDetails() {
 
 
     return (
-        <View style={{ flex: 1, backgroundColor: colors.bg }}>
+        <View style={styles.container}>
             <Header
                 title="Vendor Details"
                 variant="floating"
@@ -98,7 +98,7 @@ export default function VendorDetails() {
                     keyExtractor={menuKeyExtractor}
                     ListHeaderComponent={vendorHeader}
                     ListEmptyComponent={<EmptyState text="No menu items available." />}
-                    contentContainerStyle={{ paddingBottom: 20 }}
+                    contentContainerStyle={styles.content}
                 />
             ) : (
                 <FlatList
@@ -107,7 +107,7 @@ export default function VendorDetails() {
                     keyExtractor={reviewsKeyExtractor}
                     ListHeaderComponent={vendorHeader}
                     ListEmptyComponent={<EmptyState text="No reviews yet. Be the first!" />}
-                    contentContainerStyle={{ paddingBottom: 20 }}
+                    contentContainerStyle={styles.content}
                 />
             )}
             <WriteReviewSheet vendorId={id} vendorName={name} visible={showReviewSheet} onClose={() => setShowReviewSheet(false)} />
@@ -118,6 +118,8 @@ export default function VendorDetails() {
 
 function createVendorDetailsStyles(colors: ReturnType<typeof useTheme>["colors"]) {
     return StyleSheet.create({
+        container: { flex: 1, backgroundColor: colors.bg },
+        content: { paddingBottom: 20 },
         favoriteButton: {
             height: 44,
             width: 44,

@@ -1,7 +1,6 @@
-import { View, Pressable } from "react-native";
+import { View, Pressable, StyleSheet } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { useTheme } from "../theme/ThemeContext";
-
 
 type Props = {
     rating: number;
@@ -15,7 +14,7 @@ export function StarRating({ rating, onRatingChange, size = 28, readOnly = false
     const StarWrapper = readOnly ? View : Pressable;
 
     return (
-        <View style={{ flexDirection: "row", gap: 4 }}>
+        <View style={styles.container}>
             {[1, 2, 3, 4, 5].map((star) => (
                 <StarWrapper key={star} {...(!readOnly && { onPress: () => onRatingChange?.(star), hitSlop: 6 })}>
                     <Ionicons name={star <= rating ? "star" : "star-outline"} size={size} color={colors.rating} />
@@ -25,3 +24,6 @@ export function StarRating({ rating, onRatingChange, size = 28, readOnly = false
     );
 }
 
+const styles = StyleSheet.create({
+    container: { flexDirection: "row", gap: 4 },
+});
