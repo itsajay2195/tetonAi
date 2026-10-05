@@ -1,45 +1,26 @@
-import { Pressable, StyleSheet, Text, View, ViewStyle } from 'react-native'
+import { Pressable, StyleSheet, Text, View } from 'react-native'
 import { useTheme } from '../../theme/ThemeContext';
-import { useMemo } from 'react';
+import { useThemedStyles } from '../../hooks/useThemedStyles';
 
 type Props = {
     handleMenuPress: () => void;
     handleReviewsPress: () => void;
     reviewsCount?: number;
     isMenuActive?: boolean;
-
 };
 
 const MenuReviewsTabs = ({ handleMenuPress, handleReviewsPress, reviewsCount, isMenuActive }: Props) => {
-    const { colors } = useTheme();
+    const styles = useThemedStyles(createMenuReviewsTabsStyles);
     const hasReviews = reviewsCount && reviewsCount > 0;
-    const displayReviewsCount = hasReviews ? reviewsCount : 0;
-    const reviewsText = hasReviews ? `Reviews (${displayReviewsCount})` : "Reviews";
-    const menuTabStyle = useMemo((): ViewStyle => ({
-        flex: 1,
-        justifyContent: "center",
-        alignItems: "center",
-        backgroundColor: isMenuActive ? colors.card : "transparent",
-        paddingVertical: 4,
-        borderRadius: 10,
-    }), [isMenuActive, colors.card]);
+    const reviewsText = hasReviews ? `Reviews (${reviewsCount})` : "Reviews";
 
-    const reviewsTabStyle = useMemo((): ViewStyle => ({
-        flex: 1,
-        justifyContent: "center",
-        alignItems: "center",
-        backgroundColor: !isMenuActive ? colors.card : "transparent",
-        paddingVertical: 4,
-        borderRadius: 10,
-    }), [isMenuActive, colors.card]);
     return (
-        <View style={{ flexDirection: "row", alignItems: "center", gap: 10, paddingVertical: 4, borderRadius: 10, backgroundColor: colors.surface, }}>
-            <Pressable style={menuTabStyle} onPress={handleMenuPress}>
-                < Text style={{ color: colors.textMain, fontWeight: isMenuActive ? "700" : "400" }}> Menu</Text >
+        <View style={styles.container}>
+            <Pressable style={[styles.tab, isMenuActive && styles.tabActive]} onPress={handleMenuPress}>
+                <Text style={[styles.label, isMenuActive && styles.labelActive]}>Menu</Text>
             </Pressable>
-            <Pressable style={reviewsTabStyle} onPress={handleReviewsPress}>
-
-                <Text style={{ color: colors.textMain, fontWeight: !isMenuActive ? "700" : "400" }}>{reviewsText}</Text>
+            <Pressable style={[styles.tab, !isMenuActive && styles.tabActive]} onPress={handleReviewsPress}>
+                <Text style={[styles.label, !isMenuActive && styles.labelActive]}>{reviewsText}</Text>
             </Pressable>
         </View>
     )
@@ -47,6 +28,12 @@ const MenuReviewsTabs = ({ handleMenuPress, handleReviewsPress, reviewsCount, is
 
 export default MenuReviewsTabs
 
-
-
-
+function createMenuReviewsTabsStyles(colors: ReturnType<typeof useTheme>["colors"]) {
+    return StyleSheet.create({
+        container: { flexDirection: "row", alignItems: "center", gap: 10, paddingVertical: 4, borderRadius: 10, backgroundColor: colors.surface },
+        tab: { flex: 1, justifyContent: "center", alignItems: "center", paddingVertical: 4, borderRadius: 10, backgroundColor: "transparent" },
+        tabActive: { backgroundColor: colors.card },
+        label: { color: colors.textMain, fontWeight: "400" },
+        labelActive: { fontWeight: "700" },
+    });
+}

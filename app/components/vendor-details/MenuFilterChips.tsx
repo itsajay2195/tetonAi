@@ -1,5 +1,6 @@
-import { Pressable, Text, View } from 'react-native';
+import { Pressable, StyleSheet, Text, View } from 'react-native';
 import { useTheme } from '../../theme/ThemeContext';
+import { useThemedStyles } from '../../hooks/useThemedStyles';
 import { tokens } from '../../theme/colors';
 
 type Filter = "all" | "spicy" | "vegan";
@@ -16,26 +17,19 @@ const FILTERS: { key: Filter; label: string }[] = [
 ];
 
 export function MenuFilterChips({ selected, onSelect }: Props) {
-    const { colors } = useTheme();
+    const styles = useThemedStyles(createMenuFilterChipsStyles);
 
     return (
-        <View style={{ flexDirection: "row", gap: 8 }}>
+        <View style={styles.row}>
             {FILTERS.map(({ key, label }) => {
                 const isActive = selected === key;
                 return (
                     <Pressable
                         key={key}
                         onPress={() => onSelect(key)}
-                        style={{
-                            paddingHorizontal: tokens.spacing.md,
-                            paddingVertical: 6,
-                            borderRadius: tokens.borderRadius.full,
-                            backgroundColor: isActive ? colors.primary : colors.surface,
-                            borderWidth: 1,
-                            borderColor: isActive ? colors.primary : colors.border,
-                        }}
+                        style={[styles.chip, isActive ? styles.chipActive : styles.chipInactive]}
                     >
-                        <Text style={{ color: isActive ? colors.textOnPrimary : colors.textSecondary, fontSize: tokens.fontSize.sm, fontWeight: isActive ? "600" : "400" }}>
+                        <Text style={isActive ? styles.labelActive : styles.labelInactive}>
                             {label}
                         </Text>
                     </Pressable>
@@ -43,4 +37,20 @@ export function MenuFilterChips({ selected, onSelect }: Props) {
             })}
         </View>
     );
+}
+
+function createMenuFilterChipsStyles(colors: ReturnType<typeof useTheme>["colors"]) {
+    return StyleSheet.create({
+        row: { flexDirection: "row", gap: 8 },
+        chip: {
+            paddingHorizontal: tokens.spacing.md,
+            paddingVertical: 6,
+            borderRadius: tokens.borderRadius.full,
+            borderWidth: 1,
+        },
+        chipActive: { backgroundColor: colors.primary, borderColor: colors.primary },
+        chipInactive: { backgroundColor: colors.surface, borderColor: colors.border },
+        labelActive: { color: colors.textOnPrimary, fontSize: tokens.fontSize.sm, fontWeight: "600" },
+        labelInactive: { color: colors.textSecondary, fontSize: tokens.fontSize.sm, fontWeight: "400" },
+    });
 }

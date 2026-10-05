@@ -1,6 +1,7 @@
 import { createContext, useContext, useState, useCallback, useEffect, ReactNode } from "react";
-import { View, Text } from "react-native";
+import { View, Text, StyleSheet } from "react-native";
 import { useTheme } from "./ThemeContext";
+import { useThemedStyles } from "../hooks/useThemedStyles";
 
 const SnackbarContext = createContext<{ showError: (message: string) => void } | null>(null);
 
@@ -24,7 +25,7 @@ export function useSnackbar() {
 }
 
 function SnackbarBanner({ message, onHide }: { message: string | null; onHide: () => void }) {
-    const { colors } = useTheme();
+    const styles = useThemedStyles(createSnackbarStyles);
 
     useEffect(() => {
         if (!message) return;
@@ -35,8 +36,15 @@ function SnackbarBanner({ message, onHide }: { message: string | null; onHide: (
     if (!message) return null;
 
     return (
-        <View style={{ position: "absolute", bottom: 40, left: 20, right: 20, backgroundColor: colors.errorBg, padding: 12, borderRadius: 10 }}>
-            <Text style={{ color: colors.errorText }}>{message}</Text>
+        <View style={styles.banner}>
+            <Text style={styles.text}>{message}</Text>
         </View>
     );
+}
+
+function createSnackbarStyles(colors: ReturnType<typeof useTheme>["colors"]) {
+    return StyleSheet.create({
+        banner: { position: "absolute", bottom: 40, left: 20, right: 20, backgroundColor: colors.errorBg, padding: 12, borderRadius: 10 },
+        text: { color: colors.errorText },
+    });
 }

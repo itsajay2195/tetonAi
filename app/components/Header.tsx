@@ -21,17 +21,17 @@ export function Header({ title, showSearch, searchQuery, onSearchQueryChange, ri
     const insets = useSafeAreaInsets();
     const styles = useThemedStyles((colors) => createHeaderStyles(colors, insets.top));
     const { colors } = useTheme();
-    const navgation = useNavigation();
+    const navigation = useNavigation();
     const handleBackPress = useCallback(() => {
-        navgation.goBack();
-    }, [navgation]);
+        navigation.goBack();
+    }, [navigation]);
     if (variant === "floating") {
         return (
-            <View style={[styles.container, { position: 'absolute', top: 0, left: 0, right: 0, zIndex: 1, backgroundColor: "transparent" }]}>
-                <Pressable onPress={handleBackPress} style={{ height: 40, width: 40, justifyContent: 'center', alignItems: 'center', backgroundColor: colors.overlayButtonBg, borderRadius: 20, }}>
+            <View style={styles.floatingContainer}>
+                <Pressable onPress={handleBackPress} style={styles.backButton}>
                     <Ionicons name="chevron-back" size={18} color={colors.overlayButtonIcon} />
                 </Pressable>
-                <View style={{ flex: 1, alignItems: 'flex-end' }}>
+                <View style={styles.rightSlot}>
                     {rightChild}
                 </View>
             </View>
@@ -39,7 +39,7 @@ export function Header({ title, showSearch, searchQuery, onSearchQueryChange, ri
     }
     return (
         <View style={styles.container}>
-            {title ? <Text style={{ color: colors.textMain, fontSize: 20, fontWeight: 'bold' }}>
+            {title ? <Text style={styles.title}>
                 {title}
             </Text> : null}
             {showSearch && (
@@ -53,7 +53,6 @@ export function Header({ title, showSearch, searchQuery, onSearchQueryChange, ri
 function createHeaderStyles(colors: ReturnType<typeof useTheme>["colors"], topInset: number) {
     return StyleSheet.create({
         container: {
-            display: 'flex',
             flexDirection: 'row',
             justifyContent: 'space-between',
             alignItems: 'center',
@@ -63,8 +62,23 @@ function createHeaderStyles(colors: ReturnType<typeof useTheme>["colors"], topIn
             backgroundColor: colors.bg,
             marginTop: topInset,
         },
-
+        title: { color: colors.textMain, fontSize: 20, fontWeight: 'bold' },
+        floatingContainer: {
+            flexDirection: 'row',
+            justifyContent: 'space-between',
+            alignItems: 'center',
+            height: 60,
+            paddingHorizontal: 10,
+            gap: 10,
+            position: 'absolute',
+            top: 0,
+            marginTop: topInset,
+            left: 0,
+            right: 0,
+            zIndex: 1,
+            backgroundColor: 'transparent',
+        },
+        backButton: { height: 40, width: 40, justifyContent: 'center', alignItems: 'center', backgroundColor: colors.overlayButtonBg, borderRadius: 20 },
+        rightSlot: { flex: 1, alignItems: 'flex-end' },
     });
 }
-
-

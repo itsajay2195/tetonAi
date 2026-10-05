@@ -1,10 +1,22 @@
 import { Stack } from "expo-router";
 import { MutationCache, QueryCache, QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import { ThemeProvider } from "../theme/ThemeContext";
+import { ThemeProvider, useTheme } from "../theme/ThemeContext";
 import { SafeAreaProvider } from "react-native-safe-area-context";
 import { SnackbarProvider, useSnackbar } from "../theme/snackbarContext";
 import { NoNetworkBanner } from "../components/NoNetworkBanner";
 import { ReactNode, useState } from "react";
+
+function ThemedStack() {
+    const { colors } = useTheme();
+    return (
+        <Stack
+            screenOptions={{
+                headerShown: false,
+                contentStyle: { backgroundColor: colors.bg },
+            }}
+        />
+    );
+}
 
 function QueryProvider({ children }: { children: ReactNode }) {
     const { showError } = useSnackbar();
@@ -26,7 +38,7 @@ export default function RootLayout() {
                 <SnackbarProvider>
                     <QueryProvider>
                         <NoNetworkBanner />
-                        <Stack screenOptions={{ headerShown: false }} />
+                        <ThemedStack />
                     </QueryProvider>
                 </SnackbarProvider>
             </ThemeProvider>

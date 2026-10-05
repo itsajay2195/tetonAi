@@ -8,10 +8,12 @@ import { useDebouncedValue } from "../../../hooks/useDebouncedValue";
 import { useSearch } from "../../../api/hooks/useSearch";
 import { useTheme } from "../../../theme/ThemeContext";
 import { useThemedStyles } from "../../../hooks/useThemedStyles";
+import { LoadingState } from "../../../components/LoadingState";
+import { ErrorState } from "../../../components/ErrorState";
 
 export default function VendorsList() {
     const isAndroid = Platform.OS === 'android';
-    const styles = useThemedStyles(createHeaderStyles);
+    const styles = useThemedStyles(createVendorsListStyles);
     const [searchQuery, setSearchQuery] = useState("");
     const debouncedQuery = useDebouncedValue(searchQuery, 400);
     const isSearching = debouncedQuery.length > 0;
@@ -34,32 +36,32 @@ export default function VendorsList() {
     }, [hasNextPage, isFetchingNextPage, fetchNextPage]);
     const listEmptyComponent = useCallback(() => {
         if (isFetchingNextPage) {
-            return <View style={{ justifyContent: 'center', alignItems: 'center' }}><ActivityIndicator /></View>;
+            return <View style={styles.footer}><ActivityIndicator /></View>;
         }
         return null;
-    }, [isFetchingNextPage])
-    if (isLoading) return <View><Text>Loading...</Text></View>;
-    if (error) return <View><Text>Error: {error?.message}</Text></View>;
+    }, [isFetchingNextPage, styles])
+    if (isLoading) return <LoadingState />;
+    if (error) return <ErrorState message="Couldn't load vendors. Please try again." onRetry={refetch} />;
     const dataToRender: Vendor[] = isSearching ? searchResults : data;
     const onEndReachedHandler = isSearching ? undefined : onEndReached;
     const onRefreshHandler = isSearching ? undefined : refetch;
     const noResultsFound = isSearching && !searchLoading && searchResults?.length === 0;
     const isSearchingAndLoading = isSearching && searchLoading;
     return (
-        <View style={{ flex: 1 }}>
+        <View style={styles.container}>
             <Header showSearch={true} searchQuery={searchQuery} onSearchQueryChange={setSearchQuery} />
             {noResultsFound ? (
-                <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
+                <View style={styles.centeredMessage}>
                     <Text>No results found for "{searchQuery}"</Text>
                 </View>
             ) : null}
             {searchError ? (
-                <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
+                <View style={styles.centeredMessage}>
                     <Text>Error: {searchError?.message}</Text>
                 </View>
             ) : null}
             {isSearchingAndLoading ? (
-                <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
+                <View style={styles.centeredMessage}>
                     <Text>Searching...</Text>
                 </View>
             ) : null}
@@ -84,15 +86,11 @@ export default function VendorsList() {
 }
 
 
-function createHeaderStyles(colors: ReturnType<typeof useTheme>["colors"]) {
+function createVendorsListStyles(colors: ReturnType<typeof useTheme>["colors"]) {
     return StyleSheet.create({
-        container: {
-            flex: 1,
-            backgroundColor: colors.bg,
-        },
-        contentContainerStyle: {
-            paddingBottom: 20,
-            backgroundColor: colors.bg,
-        },
+        container: { flex: 1, backgroundColor: colors.bg },
+        contentContainerStyle: { paddingBottom: 20, backgroundColor: colors.bg },
+        footer: { justifyContent: 'center', alignItems: 'center' },
+        centeredMessage: { flex: 1, justifyContent: 'center', alignItems: 'center' },
     });
 }

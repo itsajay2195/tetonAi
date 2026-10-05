@@ -1,14 +1,18 @@
-import { Text, View, FlatList } from "react-native";
+import { StyleSheet, View, FlatList } from "react-native";
 import { useCallback } from "react";
 import VendorCard from "../../components/VendorCard";
 import { useFavorites } from "../../api/hooks/useFavorites";
 import { Vendor } from "../../types/vendor";
 import { Header } from "../../components/Header";
 import { useTheme } from "../../theme/ThemeContext";
+import { useThemedStyles } from "../../hooks/useThemedStyles";
 import { useFocusEffect } from "expo-router/build/react-navigation";
+import { LoadingState } from "../../components/LoadingState";
+import { ErrorState } from "../../components/ErrorState";
+import { EmptyState } from "../../components/EmptyState";
 
 export default function Favorites() {
-    const { colors } = useTheme();
+    const styles = useThemedStyles(createFavoritesStyles);
     const { data, isLoading, error, refetch, isRefetching } = useFavorites();
     useFocusEffect(
         useCallback(() => {
@@ -20,11 +24,11 @@ export default function Favorites() {
         <VendorCard vendor={item} />
     ), []);
 
-    if (isLoading) return <View><Text>Loading...</Text></View>;
-    if (error) return <View><Text>Error: {error.message}</Text></View>;
+    if (isLoading) return <LoadingState />;
+    if (error) return <ErrorState message="Couldn't load your favorites. Please try again." onRetry={refetch} />;
 
     return (
-        <View style={{ flex: 1, backgroundColor: colors.bg }}>
+        <View style={styles.container}>
             <Header title="Favorites" />
             <FlatList
                 data={data}
@@ -33,13 +37,16 @@ export default function Favorites() {
                 numColumns={2}
                 refreshing={isRefetching}
                 onRefresh={refetch}
-                contentContainerStyle={{ padding: 10 }}
-                ListEmptyComponent={() => (
-                    <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center', paddingVertical: 40 }}>
-                        <Text style={{ color: colors.textSecondary }}>No favorites yet. Tap the heart on a vendor to save it here.</Text>
-                    </View>
-                )}
+                contentContainerStyle={styles.content}
+                ListEmptyComponent={<EmptyState text="No favorites yet. Tap the heart on a vendor to save it here." />}
             />
         </View>
     );
+}
+
+function createFavoritesStyles(colors: ReturnType<typeof useTheme>["colors"]) {
+    return StyleSheet.create({
+        container: { flex: 1, backgroundColor: colors.bg },
+        content: { padding: 10 },
+    });
 }
