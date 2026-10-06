@@ -13,7 +13,7 @@ import { EmptyState } from "../../components/EmptyState";
 
 export default function Favorites() {
     const styles = useThemedStyles(createFavoritesStyles);
-    const { data, isLoading, error, refetch, isRefetching } = useFavorites();
+    const { data, isLoading, error, refetch } = useFavorites();
     useFocusEffect(
         useCallback(() => {
             refetch();
@@ -35,8 +35,6 @@ export default function Favorites() {
                 renderItem={renderItem}
                 keyExtractor={(item: Vendor) => item.id}
                 numColumns={2}
-                refreshing={isRefetching}
-                onRefresh={refetch}
                 contentContainerStyle={styles.content}
                 ListEmptyComponent={<EmptyState text="No favorites yet. Tap the heart on a vendor to save it here." />}
             />
