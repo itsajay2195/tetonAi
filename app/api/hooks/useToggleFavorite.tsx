@@ -1,5 +1,6 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { apiFetch } from "../config/client";
+import { VendorDetail } from "../../types/vendor";
 
 export function useToggleFavorite(vendorId: string) {
     const queryClient = useQueryClient();
@@ -14,7 +15,7 @@ export function useToggleFavorite(vendorId: string) {
             await queryClient.cancelQueries({ queryKey: ["vendor", vendorId] });
             const previousVendor = queryClient.getQueryData(["vendor", vendorId]);
 
-            queryClient.setQueryData(["vendor", vendorId], (old: any) =>
+            queryClient.setQueryData(["vendor", vendorId], (old: VendorDetail | undefined) =>
                 old ? { ...old, isFavorite: nextIsFavorite } : old
             );
 
