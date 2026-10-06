@@ -4,6 +4,7 @@ import { ThemeProvider, useTheme } from "../theme/ThemeContext";
 import { SafeAreaProvider } from "react-native-safe-area-context";
 import { SnackbarProvider, useSnackbar } from "../theme/snackbarContext";
 import { NoNetworkBanner } from "../components/NoNetworkBanner";
+import { ErrorBoundary } from "../components/ErrorBoundary";
 import { ReactNode, useState } from "react";
 
 function ThemedStack() {
@@ -35,12 +36,14 @@ export default function RootLayout() {
     return (
         <SafeAreaProvider>
             <ThemeProvider>
-                <SnackbarProvider>
-                    <QueryProvider>
-                        <NoNetworkBanner />
-                        <ThemedStack />
-                    </QueryProvider>
-                </SnackbarProvider>
+                <ErrorBoundary>
+                    <SnackbarProvider>
+                        <QueryProvider>
+                            <NoNetworkBanner />
+                            <ThemedStack />
+                        </QueryProvider>
+                    </SnackbarProvider>
+                </ErrorBoundary>
             </ThemeProvider>
         </SafeAreaProvider>
 
