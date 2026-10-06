@@ -3,7 +3,7 @@ import { useTheme } from '../../theme/ThemeContext';
 import { useThemedStyles } from '../../hooks/useThemedStyles';
 import Ionicons from '@expo/vector-icons/build/Ionicons';
 import { StarRating } from '../StarsRating';
-import { formatRelativeTime } from '../../docs/dateUtils';
+import { formatRelativeTime } from '../../utils/formatRelativeTime';
 
 type Props = {
     rating: number;

@@ -1,23 +1,15 @@
 import { useInfiniteQuery } from "@tanstack/react-query";
 import { apiFetch } from "../config/client";
+import { getNextVendorsPage } from "./getNextVendorsPage";
 
 export function useVendors() {
-
-    //data struecture of the response from the useInfiniteQuery's data
-    // }
-    // { pages: [...], pageParams: [...] }
-    // im customzigin the structure using the "selelct" option to return a flat array of vendors instead of the default structure
+    // useInfiniteQuery's raw data shape is { pages: [...], pageParams: [...] };
+    // "select" flattens it into a single array of vendors across all loaded pages.
     return useInfiniteQuery({
         queryKey: ["vendors"],
         queryFn: ({ pageParam }) => apiFetch(`/vendors?page=${pageParam}&limit=20`),
         initialPageParam: 1,
-        getNextPageParam: (lastPage) => {
-            const { page, totalPages } = lastPage;
-            return page >= totalPages ? undefined : page + 1;
-        },
+        getNextPageParam: getNextVendorsPage,
         select: (data) => data.pages.flatMap((page) => page.data),
     });
 }
-
-
-
