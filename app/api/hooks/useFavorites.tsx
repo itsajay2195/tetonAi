@@ -1,19 +1,16 @@
 import { useQuery } from "@tanstack/react-query";
 import { apiFetch } from "../config/client";
+import { Vendor } from "../../types/vendor";
+
+type FavoritesResponse = {
+    total: number;
+    data: Vendor[];
+};
 
 export function useFavorites() {
     return useQuery({
         queryKey: ["favorites"],
-        queryFn: () => apiFetch("/favorites"),
-        select: (data) => data?.data?.map((vendor: any) => ({
-            id: vendor.id,
-            name: vendor.name,
-            thumbnail: vendor.thumbnail,
-            rating: vendor.rating,
-            cuisine: vendor.cuisine,
-            city: vendor.city,
-            priceLevel: vendor.priceLevel,
-            isFavorite: true, // Since these are favorites, we can set isFavorite to true
-        })),
+        queryFn: (): Promise<FavoritesResponse> => apiFetch("/favorites"),
+        select: (data) => data.data,
     });
 }
