@@ -1,4 +1,3 @@
-// api/hooks/useStats.ts
 import { useQuery } from "@tanstack/react-query";
 import { apiFetch } from "../config/client";
 

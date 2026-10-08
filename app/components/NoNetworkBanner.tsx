@@ -1,4 +1,3 @@
-// components/NoNetworkBanner.tsx
 import { View, Text, StyleSheet } from "react-native";
 import { useNetInfo } from "@react-native-community/netinfo";
 import { useTheme } from "../theme/ThemeContext";

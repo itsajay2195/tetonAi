@@ -1,4 +1,3 @@
-// hooks/useThemedStyles.ts
 import { useMemo } from "react";
 import { useTheme } from "../theme/ThemeContext";
 
